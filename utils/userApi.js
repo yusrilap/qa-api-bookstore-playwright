@@ -1,17 +1,23 @@
 import { expect } from '@playwright/test';
 
-export async function createUser(request, username, password) {
+export async function createUser(request, password) {
+  const uniqueUsername = `user_${Date.now()}`;
+
   const response = await request.post('/Account/v1/User', {
     data: {
-      userName: username,
-      password: password
+      userName: uniqueUsername,
+      password
     }
   });
 
-  expect(response.status()).toBe(201);
+  expect([201, 406]).toContain(response.status());
 
   const body = await response.json();
-  expect(body.userID).toBeTruthy();
 
-  return body.userID;
+  if (response.status() === 201) {
+    expect(body.userID).toBeTruthy();
+    return { userId: body.userID, username: uniqueUsername };
+  }
+
+  throw new Error('User creation failed with 406 – retry test');
 }

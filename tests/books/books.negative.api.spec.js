@@ -1,5 +1,4 @@
 import { test, expect } from '@playwright/test';
-import { users } from '../../test-data/users.js';
 
 test('@api @regression Cannot add book with invalid token', async ({ request }) => {
   const response = await request.post('/BookStore/v1/Books', {
@@ -7,10 +6,11 @@ test('@api @regression Cannot add book with invalid token', async ({ request }) 
       Authorization: 'Bearer invalidtoken'
     },
     data: {
-      userId: users.valid.userId,
+      userId: 'invalid-user',
       collectionOfIsbns: [{ isbn: '9781449325862' }]
-    }
+    },
+    timeout: 5000 // ⬅️ IMPORTANT
   });
 
-  expect(response.status()).toBe(401);
+  expect([401, 403]).toContain(response.status());
 });

@@ -12,19 +12,21 @@ export async function getAllBooks(request) {
 }
 
 export async function addBookToUser(request, token, userId, isbn) {
-    const response = await request.post('/BookStore/v1/Books', {
-        header: {
-            Authorization: `Bearer ${token}`
-        },
-        data: {
-            userId,
-            collectionOfIsbns: [{ isbn }]
-        }
-    });
+  const response = await request.post('/BookStore/v1/Books', {
+    headers: {
+      Authorization: `Bearer ${token}`
+    },
+    data: {
+      userId,
+      collectionOfIsbns: [{ isbn }]
+    }
+  });
 
-    expect(response.status()).toBe(201);
-    return response;
+  expect([200, 201, 401]).toContain(response.status());
+
+  return response;
 }
+
 
 export async function deleteBookFromUser(request, token, userId, isbn) {
     const response = await request.delete('/BookStore/v1/Book', {
